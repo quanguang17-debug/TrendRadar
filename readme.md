@@ -1893,3 +1893,30 @@ GPL-3.0 License
 [🔝 回到顶部](#trendradar)
 
 </div>
+
+## Bloomberg 每日文章抓取（标题/内容/时间）
+
+如果你需要每天抓取 Bloomberg 文章，可使用脚本：`scripts_bloomberg_daily.py`。
+
+```bash
+python scripts_bloomberg_daily.py \
+  --feed https://feeds.bloomberg.com/technology/news.rss \
+  --timezone Asia/Shanghai \
+  --window-start-hour 8 \
+  --out data/bloomberg
+```
+
+输出为按天命名的 JSON 文件（例如 `data/bloomberg/bloomberg_2026-04-14.json`），每篇文章包含：
+
+- `title`：文章标题
+- `content`：文章正文（优先提取 JSON-LD 的 `articleBody`，失败则回退段落拼接）
+- `published_at`：发布时间（ISO 格式，按你指定时区转换）
+- `url`：原文链接
+
+默认抓取模式为 `window`：**昨天 08:00 到今天 08:00**（可通过 `--window-start-hour` 调整小时）。
+
+建议配合 cron 在每天 08:00 执行，例如（北京时间）：
+
+```cron
+0 8 * * * cd /workspace/TrendRadar && /usr/bin/python3 scripts_bloomberg_daily.py --timezone Asia/Shanghai --window-start-hour 8 --out data/bloomberg
+```
